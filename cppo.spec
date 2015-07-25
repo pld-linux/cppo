@@ -1,13 +1,18 @@
 #
 # Conditional build:
-%bcond_without	opt		# build opt
+%bcond_without	ocaml_opt	# skip building native optimized binaries (bytecode is always built)
+
+# not yet available on x32 (ocaml 4.02.1), remove when upstream will support it
+%ifnarch %{ix86} %{x8664} arm aarch64 ppc sparc sparcv9
+%undefine	with_ocaml_opt
+%endif
 
 %define		debug_package	%{nil}
 Summary:	cpp for OCaml
 Summary(pl.UTF-8):	Wiązania cppo dla OCamla
 Name:		cppo
 Version:	0.9.3
-Release:	1
+Release:	3
 License:	BSD
 Group:		Applications
 Source0:	http://mjambon.com/releases/cppo/%{name}-%{version}.tar.gz
@@ -29,7 +34,7 @@ używających tej biblioteki.
 %setup -q
 
 %build
-%{__make} -j1 all %{?with_opt:opt} \
+%{__make} -j1 all %{?with_ocaml_opt:opt} \
 	CC="%{__cc} %{rpmcflags} -fPIC"
 
 %install
