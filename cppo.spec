@@ -12,7 +12,7 @@ Summary:	Preprocessor (cpp equivalent) for OCaml
 Summary(pl.UTF-8):	Preprocesor (odpowiednik cpp) dla OCamla
 Name:		cppo
 Version:	1.1.2
-Release:	2
+Release:	3
 License:	BSD
 Group:		Development/Tools
 Source0:	http://mjambon.com/releases/cppo/%{name}-%{version}.tar.gz
