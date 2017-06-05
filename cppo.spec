@@ -11,14 +11,16 @@
 Summary:	Preprocessor (cpp equivalent) for OCaml
 Summary(pl.UTF-8):	Preprocesor (odpowiednik cpp) dla OCamla
 Name:		cppo
-Version:	1.1.2
-Release:	3
+Version:	1.5.0
+Release:	1
 License:	BSD
 Group:		Development/Tools
-Source0:	http://mjambon.com/releases/cppo/%{name}-%{version}.tar.gz
-# Source0-md5:	f1a551639c0c667ee8840d95ea5b2ab7
+Source0:	https://github.com/mjambon/cppo/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	bdc99442945f6bc26e7a8096d0975239
+Patch0:		noopt-install.patch
 URL:		http://mjambon.com/cppo.html
 BuildRequires:	ocaml >= 3.04-7
+BuildRequires:	ocaml-ocamlbuild
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -61,6 +63,7 @@ Pliki programistyczne biblioteki ocamlbuild_cppo.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 # "all" makes bytecode-based cppo, "opt" makes native
