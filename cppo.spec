@@ -11,16 +11,16 @@
 Summary:	Preprocessor (cpp equivalent) for OCaml
 Summary(pl.UTF-8):	Preprocesor (odpowiednik cpp) dla OCamla
 Name:		cppo
-Version:	1.5.0
+Version:	1.6.7
 Release:	1
 License:	BSD
 Group:		Development/Tools
 Source0:	https://github.com/mjambon/cppo/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	bdc99442945f6bc26e7a8096d0975239
-Patch0:		noopt-install.patch
+# Source0-md5:	88c9f9a1f067f91dab5abe1653e281a9
 URL:		http://mjambon.com/cppo.html
 BuildRequires:	ocaml >= 3.04-7
-BuildRequires:	ocaml-ocamlbuild
+BuildRequires:	ocaml-findlib
+BuildRequires:	ocaml-ocamlbuild-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -30,8 +30,8 @@ and syntax. It allows defining simple macros and file inclusion.
 
 %description -l pl.UTF-8
 Cppo to przyjazna dla OCamla implementacja cpp - preprocesora języka
-C. Może zastąpić preprocesor camlp4 przy przetwarzaniu plików OCamla
-z wykorzystaniem stylu oraz składni cpp. Pozwala na definiowanie
+C. Może zastąpić preprocesor camlp4 przy przetwarzaniu plików OCamla z
+wykorzystaniem stylu oraz składni cpp. Pozwala na definiowanie
 prostych makr oraz włączanie plików.
 
 %package -n ocamlbuild-cppo
@@ -40,7 +40,7 @@ Summary(pl.UTF-8):	Wtyczka cppo dla ocamlbuilda
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 # ocamlbuild resides in ocaml package, so don't require just ocaml-runtime
-%requires_eq	ocaml
+%requires_eq ocaml
 
 %description -n ocamlbuild-cppo
 Cppo plugin for ocamlbuild.
@@ -53,7 +53,7 @@ Summary:	Development files for ocamlbuild_cppo library
 Summary(pl.UTF-8):	Pliki programistyczne biblioteki ocamlbuild_cppo
 Group:		Development/Libraries
 Requires:	ocamlbuild-cppo = %{version}-%{release}
-%requires_eq	ocaml
+%requires_eq ocaml
 
 %description -n ocamlbuild-cppo-devel
 Development files for ocamlbuild_cppo library.
@@ -63,48 +63,43 @@ Pliki programistyczne biblioteki ocamlbuild_cppo.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
-# "all" makes bytecode-based cppo, "opt" makes native
-%{__make} -j1 %{!?with_ocaml_opt:all} %{?with_ocaml_opt:opt} ocamlbuild \
-	%{!?with_ocaml_opt:BEST=byte} \
-	CC="%{__cc} %{rpmcflags} -fPIC"
+dune build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/ocaml/site-lib/cppo_ocamlbuild,%{_examplesdir}}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/ocaml{/site-lib,}/cppo_ocamlbuild,%{_examplesdir}}
 
-# make install-bin is broken outside Win*
-install -p cppo $RPM_BUILD_ROOT%{_bindir}
-
-%{__make} install-lib \
-	%{!?with_ocaml_opt:BEST=byte} \
-	OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
+cp -p _build/install/default/bin/cppo $RPM_BUILD_ROOT%{_bindir}
+cp -Lr _build/install/default/lib/cppo_ocamlbuild $RPM_BUILD_ROOT%{_libdir}/ocaml/
 
 cp -pr examples $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
-%{__mv} $RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/META \
-	$RPM_BUILD_ROOT%{_libdir}/ocaml/site-lib/cppo_ocamlbuild
-cat >>$RPM_BUILD_ROOT%{_libdir}/ocaml/site-lib/cppo_ocamlbuild/META <<EOF
+cat >>$RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/META <<EOF
 directory="+cppo_ocamlbuild"
 EOF
+ln -sr $RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/META \
+	$RPM_BUILD_ROOT%{_libdir}/ocaml/site-lib/cppo_ocamlbuild
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc Changes LICENSE README.md
+%doc Changes LICENSE.md README.md
 %attr(755,root,root) %{_bindir}/cppo
 %{_examplesdir}/%{name}-%{version}
 
 %files -n ocamlbuild-cppo
 %defattr(644,root,root,755)
 %dir %{_libdir}/ocaml/cppo_ocamlbuild
-%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cma
+%{_libdir}/ocaml/cppo_ocamlbuild/META
+%{_libdir}/ocaml/cppo_ocamlbuild/dune-package
+%{_libdir}/ocaml/cppo_ocamlbuild/opam
+%{_libdir}/ocaml/cppo_ocamlbuild/cppo_ocamlbuild.cma
 %if %{with ocaml_opt}
-%attr(755,root,root) %{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmxs
+%attr(755,root,root) %{_libdir}/ocaml/cppo_ocamlbuild/cppo_ocamlbuild.cmxs
 %endif
 %{_libdir}/ocaml/site-lib/cppo_ocamlbuild
 
@@ -112,6 +107,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmi
 %if %{with ocaml_opt}
-%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmxa
-%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.a
+%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmx
+%{_libdir}/ocaml/cppo_ocamlbuild/cppo_ocamlbuild.cmxa
+%{_libdir}/ocaml/cppo_ocamlbuild/cppo_ocamlbuild.a
 %endif
+%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.mli
+%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmt
+%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.cmti
