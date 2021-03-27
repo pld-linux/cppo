@@ -12,7 +12,7 @@ Summary:	Preprocessor (cpp equivalent) for OCaml
 Summary(pl.UTF-8):	Preprocesor (odpowiednik cpp) dla OCamla
 Name:		cppo
 Version:	1.6.7
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Tools
 Source0:	https://github.com/mjambon/cppo/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -69,18 +69,12 @@ dune build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/ocaml{/site-lib,}/cppo_ocamlbuild,%{_examplesdir}}
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_libdir}/ocaml,%{_examplesdir}}
 
 cp -p _build/install/default/bin/cppo $RPM_BUILD_ROOT%{_bindir}
 cp -Lr _build/install/default/lib/cppo_ocamlbuild $RPM_BUILD_ROOT%{_libdir}/ocaml/
 
 cp -pr examples $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
-
-cat >>$RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/META <<EOF
-directory="+cppo_ocamlbuild"
-EOF
-ln -sr $RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/META \
-	$RPM_BUILD_ROOT%{_libdir}/ocaml/site-lib/cppo_ocamlbuild
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -101,7 +95,6 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with ocaml_opt}
 %attr(755,root,root) %{_libdir}/ocaml/cppo_ocamlbuild/cppo_ocamlbuild.cmxs
 %endif
-%{_libdir}/ocaml/site-lib/cppo_ocamlbuild
 
 %files -n ocamlbuild-cppo-devel
 %defattr(644,root,root,755)
