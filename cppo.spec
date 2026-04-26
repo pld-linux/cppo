@@ -11,13 +11,13 @@
 Summary:	Preprocessor (cpp equivalent) for OCaml
 Summary(pl.UTF-8):	Preprocesor (odpowiednik cpp) dla OCamla
 Name:		cppo
-Version:	1.6.8
+Version:	1.6.9
 Release:	1
 License:	BSD
 Group:		Development/Tools
 #Source0Download: https://github.com/ocaml-community/cppo/releases
 Source0:	https://github.com/mjambon/cppo/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	fed401197d86f9089e89f6cbdf1d660d
+# Source0-md5:	d23ffe85ac7dc8f0afd1ddf622770d09
 URL:		http://mjambon.com/cppo.html
 BuildRequires:	ocaml >= 1:4.02.3
 BuildRequires:	ocaml-dune >= 1.0
@@ -82,14 +82,14 @@ cp -pr examples $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 # sources
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/ocaml/cppo_ocamlbuild/ocamlbuild_cppo.ml
 # packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc/{cppo,cppo_ocamlbuild}
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/{cppo,cppo_ocamlbuild}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc Changes LICENSE.md README.md
+%doc Changes.md LICENSE.md README.md
 %attr(755,root,root) %{_bindir}/cppo
 %{_examplesdir}/%{name}-%{version}
 
